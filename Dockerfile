@@ -1,8 +1,15 @@
 FROM n8nio/n8n:latest
 
-# Install Python and build dependencies (n8n image is Alpine-based)
+# Install Python and build dependencies (n8n image is Debian-based, so we use apt-get)
 USER root
-RUN apk add --no-cache python3 py3-pip python3-dev build-base
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    build-essential \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create and activate Python virtual environment
 RUN python3 -m venv /venv
