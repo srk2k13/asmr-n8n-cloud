@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Start the Python video server in the background (runs locally inside the container on port 5688)
-python3 -u /home/user/app/video_server.py &
+# Start the Python video server in the background (runs on port 5688 internally)
+python3 -u /etc/n8n/video_server.py &
 
-# Start n8n in the foreground (runs on port 7860 as expected by Hugging Face)
-n8n start
+# Start n8n using the official entrypoint wrapper (handles database, migrations, and binds to Render's $PORT automatically)
+tini -- /docker-entrypoint.sh
