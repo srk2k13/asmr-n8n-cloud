@@ -1,28 +1,27 @@
-FROM n8nio/n8n:latest
+FROM node:18-alpine
 
-# Install Python and build dependencies (n8n image is Debian-based, so we use apt-get)
-USER root
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-dev \
-    build-essential \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (Python, Git, FFmpeg)
+RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg
 
-# Create and activate Python virtual environment
-RUN python3 -m venv /venv
-ENV PATH="/venv/bin:$PATH"
+# Install n8n globally
+RUN npm install -g n8n
 
-# Install Python requirements
+# Set up directory for python server
+WORKDIR /app
+
+# Create python virtual env
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Install python dependencies
 RUN pip3 install --no-cache-dir requests gradio_client
 
-# Copy video server files
-COPY video_server.py /etc/n8n/video_server.py
-COPY start.sh /etc/n8n/start.sh
+# Copy server files
+COPY video_server.py /app/video_server.py
+COPY start.sh /app/start.sh
 
-RUN chmod +x /etc/n8n/start.sh
+RUN chmod +x /app/start.sh
 
-# Execute startup script
-CMD ["/etc/n8n/start.sh"]
+# Render maps the main port to whatever port the application listens on.
+# start.sh will run n8n in the foreground which respects the $PORT env var.
+CMD ["/app/start.sh"]
