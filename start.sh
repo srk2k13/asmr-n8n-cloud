@@ -1,7 +1,10 @@
 #!/bin/sh
 
-# Start the Python video server in the background (runs on port 5688 internally)
+# Start the Python video server in the background (runs locally on port 5688)
 python3 -u /app/video_server.py &
 
-# Start n8n in the foreground (runs on the port Render sets in the $PORT environment variable)
+# Ensure n8n binds to the port assigned by Render ($PORT, which defaults to 10000 on Render)
+export N8N_PORT=${PORT:-5678}
+
+# Start n8n in the foreground
 n8n start
