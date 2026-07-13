@@ -127,7 +127,9 @@ def generate_video_free_hf(prompt):
                     client = Client(space)
                 
                 enhanced_prompt = prompt
-                if "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
+                if "glass" in prompt.lower() or "crystal" in prompt.lower():
+                    enhanced_prompt = prompt + ", a sharp steel knife actively slicing downwards in slow motion, transparent glass shards cracking and scattering, sparkling reflections, hyper-realistic glass texture, macro close-up, smooth motion, high frame rate, 3D render style."
+                elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
                     enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards."
                 
                 print(f"DEBUG Server: Sending prompt to LTX-Video: {enhanced_prompt}", sys.stderr)
