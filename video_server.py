@@ -126,7 +126,7 @@ def generate_video_free_hf(prompt):
                 else:
                     client = Client(space)
                 
-                                enhanced_prompt = prompt
+                enhanced_prompt = prompt
                 if "glass" in prompt.lower() or "crystal" in prompt.lower() or "transparent" in prompt.lower():
                     # Extract color to enforce solid color matching and prevent blue/CGI looks
                     color = "colored"
