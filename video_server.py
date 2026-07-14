@@ -170,7 +170,7 @@ def generate_and_upload(prompt, search_query=""):
     
     # 1. Check for specific glass/crystal fruit prompts to trigger real glass AI generation
     prompt_lower = prompt.lower()
-    is_glass_fruit = any(fruit in prompt_lower for fruit in ["apple", "watermelon", "strawberry", "pineapple", "mango", "orange", "coconut", "kiwi", "grapes", "cherries"]) and any(word in prompt_lower for word in ["glass", "crystal"])
+    is_glass_fruit = any(word in prompt_lower for word in ["glass", "crystal", "transparent"])
     if is_glass_fruit:
         # Loop to retry generation on busy HF space to guarantee AI glass video and prevent normal fruit fallback
         for attempt in range(3):
