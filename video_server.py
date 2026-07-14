@@ -126,11 +126,24 @@ def generate_video_free_hf(prompt):
                 else:
                     client = Client(space)
                 
-                enhanced_prompt = prompt
-                if "glass" in prompt.lower() or "crystal" in prompt.lower():
-                    enhanced_prompt = prompt + ", a sharp steel knife actively slicing downwards in slow motion, realistic matching glass shards cracking and scattering, sparkling reflections, photorealistic glass texture, macro close-up, natural lighting, realistic physics, smooth motion, high frame rate, photorealistic real-life footage."
+                                enhanced_prompt = prompt
+                if "glass" in prompt.lower() or "crystal" in prompt.lower() or "transparent" in prompt.lower():
+                    # Extract color to enforce solid color matching and prevent blue/CGI looks
+                    color = "colored"
+                    for c in ["yellow", "red", "green", "orange", "purple", "golden", "brown", "pink"]:
+                        if c in prompt.lower():
+                            color = c
+                            break
+                    enhanced_prompt = (
+                        prompt + f", a sharp steel knife actively slicing downwards in slow motion, "
+                        f"{color} glass shards cracking and scattering, sparkling reflections, "
+                        f"solid {color} glass material throughout, no blue inside, "
+                        f"photorealistic glass texture, macro close-up, natural studio lighting, "
+                        f"realistic physics, dark slate tabletop background, smooth motion, "
+                        f"high frame rate, photorealistic real-life footage."
+                    )
                 elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
-                    enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards."
+                    enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards." 
                 
                 print(f"DEBUG Server: Sending prompt to LTX-Video: {enhanced_prompt}", sys.stderr)
                 
