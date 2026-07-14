@@ -128,7 +128,7 @@ def generate_video_free_hf(prompt):
                 
                 enhanced_prompt = prompt
                 if "glass" in prompt.lower() or "crystal" in prompt.lower():
-                    enhanced_prompt = prompt + ", a sharp steel knife actively slicing downwards in slow motion, transparent glass shards cracking and scattering, sparkling reflections, hyper-realistic glass texture, macro close-up, smooth motion, high frame rate, 3D render style."
+                    enhanced_prompt = prompt + ", a sharp steel knife actively slicing downwards in slow motion, realistic matching glass shards cracking and scattering, sparkling reflections, photorealistic glass texture, macro close-up, natural lighting, realistic physics, smooth motion, high frame rate, photorealistic real-life footage."
                 elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
                     enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards."
                 
