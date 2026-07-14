@@ -129,19 +129,24 @@ def generate_video_free_hf(prompt):
                 
                 enhanced_prompt = prompt
                 if "glass" in prompt.lower() or "crystal" in prompt.lower() or "transparent" in prompt.lower():
-                    # Extract color to enforce solid color matching and prevent blue/CGI looks
-                    color = "colored"
-                    for c in ["yellow", "red", "green", "orange", "purple", "golden", "brown", "pink"]:
+                    # Extract color and food name to construct a super clean, direct, shape-focused prompt
+                    color = "yellow"
+                    for c in ["yellow", "red", "green", "orange", "purple", "golden", "brown", "pink", "blue"]:
                         if c in prompt.lower():
                             color = c
                             break
+                    
+                    fruit = "banana"
+                    for f in ["banana split", "watermelon", "apple", "mango", "pineapple", "orange", "strawberry", "dragon fruit", "kiwi", "grape", "cherry", "banana", "lemon", "lime", "cheeseburger", "pizza", "samosa", "donut", "cake", "croissant", "sushi", "ice cream", "chocolate", "taco"]:
+                        if f in prompt.lower():
+                            fruit = f
+                            break
+                            
+                    # Build a concise, direct, shape-focused prompt to prevent model losing subject focus
                     enhanced_prompt = (
-                        prompt + f", a sharp steel knife actively slicing downwards in slow motion, "
-                        f"{color} glass shards cracking and scattering, sparkling reflections, "
-                        f"solid {color} glass material throughout, no blue inside, "
-                        f"photorealistic glass texture, macro close-up, natural studio lighting, "
-                        f"realistic physics, dark slate tabletop background, smooth motion, "
-                        f"high frame rate, photorealistic real-life footage."
+                        f"A photorealistic translucent {color} glass {fruit} being sliced cleanly in half by a sharp knife, in slow motion. "
+                        f"Shards of {color} glass cracking and scattering, solid {color} glass material throughout, "
+                        f"natural lighting, dark slate tabletop background, high frame rate, macro close-up."
                     )
                 elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
                     enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards." 
