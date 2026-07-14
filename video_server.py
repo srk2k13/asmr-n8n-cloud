@@ -142,11 +142,11 @@ def generate_video_free_hf(prompt):
                             fruit = f
                             break
                             
-                    # Build a concise, direct, shape-focused prompt to prevent model losing subject focus
+                    # Build a highly active, knife-focused prompt to force LTX-Video to render the knife slicing action
                     enhanced_prompt = (
-                        f"A photorealistic translucent {color} glass {fruit} being sliced cleanly in half by a sharp knife, in slow motion. "
+                        f"A sharp steel chef's knife actively slicing downwards in slow motion through a photorealistic translucent {color} glass {fruit} on a dark slate tabletop, cutting it cleanly in two pieces. "
                         f"Shards of {color} glass cracking and scattering, solid {color} glass material throughout, "
-                        f"natural lighting, dark slate tabletop background, high frame rate, macro close-up."
+                        f"natural lighting, high frame rate, macro close-up."
                     )
                 elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
                     enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards." 
@@ -161,8 +161,8 @@ def generate_video_free_hf(prompt):
                     height_ui=512,
                     width_ui=704,
                     mode="text-to-video",
-                    duration_ui=3,
-                    ui_frames_to_use=9,
+                    duration_ui=5,
+                    ui_frames_to_use=17,
                     seed_ui=random.randint(1, 1000000),
                     randomize_seed=True,
                     ui_guidance_scale=3.0,
