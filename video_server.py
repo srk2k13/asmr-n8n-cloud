@@ -280,7 +280,7 @@ def generate_and_upload(prompt, search_query=""):
     return None
 
 def run_server():
-    server_address = ('', PORT)
+    server_address = ('127.0.0.1', PORT)
     ThreadingHTTPServer.allow_reuse_address = True
     httpd = ThreadingHTTPServer(server_address, VideoServerHandler)
     print(f"DEBUG Server: Starting local ASMR Video Server on port {PORT}...", sys.stderr)
