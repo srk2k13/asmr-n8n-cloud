@@ -114,7 +114,8 @@ def generate_video_free_hf(prompt):
         "Ofirzarfati/LTX-Video-ZeroGPU-Optimized",
         "cocktailpeanut/LTX-Video-Playground"
     ]
-    token = os.environ.get("HF_TOKEN", "hf_qoLesbGNTkciYElMR" + "qOotnQaPJicOAlPqj")
+    token = os.environ.get("HF_TOKEN") or os.environ.get("hf_token") or os.environ.get("HuggingFace_Token") or os.environ.get("hftoken") or ("hf_qoLesbGNTkciYElMR" + "qOotnQaPJicOAlPqj")
+    print(f"DEBUG Server: Loaded HF token prefix: {token[:8]} (Length: {len(token)})", sys.stderr)
     
     for space in spaces:
         for use_token in [True, False]:
