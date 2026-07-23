@@ -1,15 +1,10 @@
-FROM node:20-alpine
+FROM n8nio/n8n:latest
 
-# Install system dependencies (Python, Git, FFmpeg, native libs for n8n)
-RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg gcompat libc6-compat vips-dev
+USER root
 
-# Install n8n globally (latest version)
-ARG BUILD_DATE=2026-07-23-v3
-RUN npm install -g n8n@latest --unsafe-perm
+# Install system dependencies (Python, Git, FFmpeg)
+RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg
 
-
-
-# Set up directory for python server
 WORKDIR /app
 
 # Create python virtual env
@@ -26,5 +21,6 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Render maps the main port to whatever port the application listens on.
-# start.sh will run n8n in the foreground which respects the $PORT env var.
+ENTRYPOINT []
 CMD ["/app/start.sh"]
+
