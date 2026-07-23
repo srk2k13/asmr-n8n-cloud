@@ -1,11 +1,12 @@
 FROM node:20-alpine
 
-# Install system dependencies (Python, Git, FFmpeg)
-RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg
+# Install system dependencies (Python, Git, FFmpeg, native libs for n8n)
+RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg gcompat libc6-compat vips-dev
 
 # Install n8n globally (latest version)
-ARG BUILD_DATE=2026-07-23-v2
-RUN npm install -g n8n@latest
+ARG BUILD_DATE=2026-07-23-v3
+RUN npm install -g n8n@latest --unsafe-perm
+
 
 
 # Set up directory for python server
