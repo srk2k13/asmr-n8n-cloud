@@ -3,8 +3,9 @@ FROM node:20-alpine
 # Install system dependencies (Python, Git, FFmpeg)
 RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg
 
-# Install n8n globally (v1.70.0 stable)
-RUN npm install -g n8n@1.70.0 --unsafe-perm
+# Install n8n globally (v1.121.0 stable)
+RUN npm install -g n8n@1.121.0 --unsafe-perm
+
 
 
 
