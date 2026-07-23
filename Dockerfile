@@ -21,4 +21,5 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Render maps the main port to whatever port the application listens on.
-CMD ["/app/start.sh"]
+ENTRYPOINT []
+CMD ["/bin/sh", "/app/start.sh"]
