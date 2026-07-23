@@ -1,10 +1,12 @@
 FROM node:20-alpine
 
 # Install system dependencies (Python, Git, FFmpeg)
-RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg
+RUN apk add --no-cache python3 py3-pip python3-dev build-base git ffmpeg gcompat libc6-compat
 
-# Install n8n globally (v1.70.0 with updated LinkedIn API headers)
-RUN npm install -g n8n@1.70.0 --unsafe-perm
+# Install n8n globally (latest version)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+RUN npm install -g n8n@latest --unsafe-perm
+
 
 # Set up directory for python server
 WORKDIR /app
