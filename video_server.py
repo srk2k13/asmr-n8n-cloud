@@ -110,17 +110,12 @@ def search_pexels(query):
 def generate_video_free_hf(prompt):
     print("DEBUG Server: Attempting free Hugging Face LTX-Video Space generation...", sys.stderr)
     
-    spaces = [
-        "Lightricks/ltx-video-distilled",
-        "Magnetism4236/LTX-Video-ZeroGPU-Optimized",
-        "Ofirzarfati/LTX-Video-ZeroGPU-Optimized",
-        "cocktailpeanut/LTX-Video-Playground"
-    ]
+    spaces = ["Lightricks/ltx-video-distilled"]
     token = os.environ.get("HF_TOKEN") or os.environ.get("hf_token") or os.environ.get("HuggingFace_Token") or os.environ.get("hftoken") or ("hf_qoLesbGNTkciYElMR" + "qOotnQaPJicOAlPqj")
     print(f"DEBUG Server: Loaded HF token prefix: {token[:8]} (Length: {len(token)})", sys.stderr)
     
     for space in spaces:
-        for use_token in [True, False]:
+        for use_token in [True]:
             token_label = "with token" if use_token else "without token"
             print(f"DEBUG Server: Trying Space {space} ({token_label})...", sys.stderr)
             try:
@@ -211,17 +206,16 @@ def generate_and_upload(prompt, search_query="", audio_url=""):
     local_video_path = None
     is_glass_fruit = any(word in prompt_lower for word in ["glass", "crystal", "transparent"])
     
-    # 1. Hugging Face AI Generation (for glass/crystal fruit)
+    # 1. Fast Hugging Face AI Generation (1 fast attempt, max 20s)
     if is_glass_fruit:
-        for attempt in range(3):
-            print(f"DEBUG Server: Attempting Hugging Face generation (try {attempt+1}/3)...", sys.stderr)
+        print("DEBUG Server: Attempting fast Hugging Face generation...", sys.stderr)
+        try:
             local_video_path = generate_video_free_hf(prompt)
-            if local_video_path and os.path.exists(local_video_path):
-                break
-            print("DEBUG Server: Generation failed, waiting 5 seconds before retry...", sys.stderr)
-            time.sleep(5)
+        except Exception as e:
+            print(f"DEBUG Server: Fast HF generation exception: {e}", sys.stderr)
+            
         if not local_video_path or not os.path.exists(local_video_path):
-            print("DEBUG Server: HF space generation failed after 3 attempts. Falling back gracefully to Pexels stock video...", sys.stderr)
+            print("DEBUG Server: HF space generation bypassed/failed. Falling back immediately to fast Pexels stock video + ASMR audio merge...", sys.stderr)
             
     # 2. Pexels search query or direct URL fallback (for non-glass topics)
     if not local_video_path and search_query:
