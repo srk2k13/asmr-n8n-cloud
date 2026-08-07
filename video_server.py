@@ -107,78 +107,70 @@ def search_pexels(query):
         print(f"DEBUG Server: Pexels fallback search error: {e}", sys.stderr)
     return None
 
+import concurrent.futures
+
+def _hf_predict_worker(space, token, enhanced_prompt):
+    if token:
+        client = Client(space, token=token)
+    else:
+        client = Client(space)
+    return client.predict(
+        prompt=enhanced_prompt,
+        negative_prompt="worst quality, inconsistent motion, blurry, jittery, distorted, low quality, static, still image, photograph, watermark",
+        input_image_filepath=None,
+        input_video_filepath=None,
+        height_ui=512,
+        width_ui=704,
+        mode="text-to-video",
+        duration_ui=3,
+        ui_frames_to_use=9,
+        seed_ui=random.randint(1, 1000000),
+        randomize_seed=True,
+        ui_guidance_scale=3.0,
+        improve_texture_flag=True,
+        api_name="/text_to_video"
+    )
+
 def generate_video_free_hf(prompt):
-    print("DEBUG Server: Attempting free Hugging Face LTX-Video Space generation...", sys.stderr)
-    
-    spaces = ["Lightricks/ltx-video-distilled"]
+    print("DEBUG Server: Attempting fast free Hugging Face LTX-Video Space generation...", sys.stderr)
+    space = "Lightricks/ltx-video-distilled"
     token = os.environ.get("HF_TOKEN") or os.environ.get("hf_token") or os.environ.get("HuggingFace_Token") or os.environ.get("hftoken") or ("hf_qoLesbGNTkciYElMR" + "qOotnQaPJicOAlPqj")
-    print(f"DEBUG Server: Loaded HF token prefix: {token[:8]} (Length: {len(token)})", sys.stderr)
     
-    for space in spaces:
-        for use_token in [True]:
-            token_label = "with token" if use_token else "without token"
-            print(f"DEBUG Server: Trying Space {space} ({token_label})...", sys.stderr)
-            try:
-                if use_token:
-                    client = Client(space, token=token)
-                else:
-                    client = Client(space)
-                
-                enhanced_prompt = prompt
-                if "glass" in prompt.lower() or "crystal" in prompt.lower() or "transparent" in prompt.lower():
-                    # Extract color and food name to construct a super clean, direct, shape-focused prompt
-                    color = "yellow"
-                    for c in ["yellow", "red", "green", "orange", "purple", "golden", "brown", "pink", "blue"]:
-                        if c in prompt.lower():
-                            color = c
-                            break
-                    
-                    fruit = "banana"
-                    for f in ["banana split", "watermelon", "apple", "mango", "pineapple", "orange", "strawberry", "dragon fruit", "kiwi", "grape", "cherry", "banana", "lemon", "lime", "cheeseburger", "pizza", "samosa", "donut", "cake", "croissant", "sushi", "ice cream", "chocolate", "taco"]:
-                        if f in prompt.lower():
-                            fruit = f
-                            break
-                            
-                    # Build a highly active, knife-focused prompt to force LTX-Video to render the knife slicing action
-                    enhanced_prompt = (
-                        f"A sharp steel chef's knife actively slicing downwards in slow motion through a photorealistic translucent {color} glass {fruit} on a dark slate tabletop, cutting it cleanly in two pieces. "
-                        f"Shards of {color} glass cracking and scattering, solid {color} glass material throughout, "
-                        f"natural lighting, high frame rate, macro close-up."
-                    )
-                elif "slicing" not in enhanced_prompt.lower() and "cutting" not in enhanced_prompt.lower() and "peeling" not in enhanced_prompt.lower():
-                    enhanced_prompt += ", knife slicing through the crystal glass, slow motion, satisfying cracking shards." 
-                
-                print(f"DEBUG Server: Sending prompt to LTX-Video: {enhanced_prompt}", sys.stderr)
-                
-                result = client.predict(
-                    prompt=enhanced_prompt,
-                    negative_prompt="worst quality, inconsistent motion, blurry, jittery, distorted, low quality, static, still image, photograph, watermark",
-                    input_image_filepath=None,
-                    input_video_filepath=None,
-                    height_ui=512,
-                    width_ui=704,
-                    mode="text-to-video",
-                    duration_ui=3,
-                    ui_frames_to_use=9,
-                    seed_ui=random.randint(1, 1000000),
-                    randomize_seed=True,
-                    ui_guidance_scale=3.0,
-                    improve_texture_flag=True,
-                    api_name="/text_to_video"
-                )
-                
-                if isinstance(result, tuple) and len(result) > 0:
-                    res_dict = result[0]
-                    video_path = res_dict.get("video") if isinstance(res_dict, dict) else res_dict
-                    if video_path and os.path.exists(video_path):
-                        print(f"DEBUG Server: Video generated successfully via Hugging Face space {space}: {video_path}", sys.stderr)
-                        return video_path
-                elif isinstance(result, str) and os.path.exists(result):
-                    print(f"DEBUG Server: Video generated successfully via Hugging Face space {space}: {result}", sys.stderr)
-                    return result
-            except Exception as e:
-                print(f"DEBUG Server: Hugging Face space {space} ({token_label}) generation failed: {e}", sys.stderr)
-                
+    enhanced_prompt = prompt
+    if "glass" in prompt.lower() or "crystal" in prompt.lower() or "transparent" in prompt.lower():
+        color = "yellow"
+        for c in ["yellow", "red", "green", "orange", "purple", "golden", "brown", "pink", "blue"]:
+            if c in prompt.lower():
+                color = c
+                break
+        fruit = "banana"
+        for f in ["banana split", "watermelon", "apple", "mango", "pineapple", "orange", "strawberry", "dragon fruit", "kiwi", "grape", "cherry", "banana", "lemon", "lime", "cheeseburger", "pizza", "samosa", "donut", "cake", "croissant", "sushi", "ice cream", "chocolate", "taco"]:
+            if f in prompt.lower():
+                fruit = f
+                break
+        enhanced_prompt = (
+            f"A sharp steel chef's knife actively slicing downwards in slow motion through a photorealistic translucent {color} glass {fruit} on a dark slate tabletop, cutting it cleanly in two pieces. "
+            f"Shards of {color} glass cracking and scattering, solid {color} glass material throughout, natural lighting, high frame rate, macro close-up."
+        )
+        
+    print(f"DEBUG Server: Submitting to HF space with 15s timeout: {enhanced_prompt}", sys.stderr)
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_hf_predict_worker, space, token, enhanced_prompt)
+            result = future.result(timeout=15) # Strict 15s timeout!
+            
+            if isinstance(result, tuple) and len(result) > 0:
+                res_dict = result[0]
+                video_path = res_dict.get("video") if isinstance(res_dict, dict) else res_dict
+                if video_path and os.path.exists(video_path):
+                    print(f"DEBUG Server: Video generated via HF space in <15s: {video_path}", sys.stderr)
+                    return video_path
+            elif isinstance(result, str) and os.path.exists(result):
+                print(f"DEBUG Server: Video generated via HF space in <15s: {result}", sys.stderr)
+                return result
+    except Exception as e:
+        print(f"DEBUG Server: HF space timed out (>15s) or failed: {e}. Switching immediately to ultra-fast Pexels search...", sys.stderr)
+        
     return None
 
 def download_temp_file(url, suffix):
