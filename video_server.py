@@ -221,7 +221,7 @@ def generate_and_upload(prompt, search_query="", audio_url=""):
             print("DEBUG Server: Generation failed, waiting 5 seconds before retry...", sys.stderr)
             time.sleep(5)
         if not local_video_path or not os.path.exists(local_video_path):
-            raise Exception("Failed to generate glass fruit video after 3 attempts.")
+            print("DEBUG Server: HF space generation failed after 3 attempts. Falling back gracefully to Pexels stock video...", sys.stderr)
             
     # 2. Pexels search query or direct URL fallback (for non-glass topics)
     if not local_video_path and search_query:
