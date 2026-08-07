@@ -277,6 +277,19 @@ def generate_and_upload(prompt, search_query="", audio_url=""):
     temp_audio_path = None
     merged_video_path = None
     
+    # Default fallback to natural ASMR audio if missing or undefined
+    if not audio_url or str(audio_url).strip() == "" or str(audio_url).lower() == "undefined":
+        if any(w in prompt_lower for w in ["water", "liquid", "flow", "pour", "milk", "cream"]):
+            audio_url = "https://raw.githubusercontent.com/karolpiczak/ESC-50/master/audio/1-16746-A-15.wav"
+        elif any(w in prompt_lower for w in ["bead", "marble", "ball", "rolling"]):
+            audio_url = "https://raw.githubusercontent.com/karolpiczak/ESC-50/master/audio/1-118206-A-31.wav"
+        elif any(w in prompt_lower for w in ["bubble", "foam", "sponge", "pop"]):
+            audio_url = "https://raw.githubusercontent.com/karolpiczak/ESC-50/master/audio/1-17565-A-12.wav"
+        else:
+            # Natural knife slicing ASMR sound (crystal clear real knife cut)
+            audio_url = "https://raw.githubusercontent.com/developer-soni/Fruit-Slice-Game/main/audio/slicefruit.mp3"
+        print(f"DEBUG Server: Inferred natural ASMR audio URL: {audio_url}", sys.stderr)
+
     if audio_url and str(audio_url).strip() != "" and str(audio_url).lower() != "undefined":
         try:
             print(f"DEBUG Server: Downloading audio for merge from {audio_url}...", sys.stderr)
