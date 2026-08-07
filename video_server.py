@@ -154,22 +154,24 @@ def generate_video_free_hf(prompt):
         )
         
     print(f"DEBUG Server: Submitting to HF space with 15s timeout: {enhanced_prompt}", sys.stderr)
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_hf_predict_worker, space, token, enhanced_prompt)
-            result = future.result(timeout=15) # Strict 15s timeout!
-            
-            if isinstance(result, tuple) and len(result) > 0:
-                res_dict = result[0]
-                video_path = res_dict.get("video") if isinstance(res_dict, dict) else res_dict
-                if video_path and os.path.exists(video_path):
-                    print(f"DEBUG Server: Video generated via HF space in <15s: {video_path}", sys.stderr)
-                    return video_path
-            elif isinstance(result, str) and os.path.exists(result):
-                print(f"DEBUG Server: Video generated via HF space in <15s: {result}", sys.stderr)
-                return result
+        future = executor.submit(_hf_predict_worker, space, token, enhanced_prompt)
+        result = future.result(timeout=15)
+        executor.shutdown(wait=False, cancel_futures=True)
+        
+        if isinstance(result, tuple) and len(result) > 0:
+            res_dict = result[0]
+            video_path = res_dict.get("video") if isinstance(res_dict, dict) else res_dict
+            if video_path and os.path.exists(video_path):
+                print(f"DEBUG Server: Video generated via HF space in <15s: {video_path}", sys.stderr)
+                return video_path
+        elif isinstance(result, str) and os.path.exists(result):
+            print(f"DEBUG Server: Video generated via HF space in <15s: {result}", sys.stderr)
+            return result
     except Exception as e:
         print(f"DEBUG Server: HF space timed out (>15s) or failed: {e}. Switching immediately to ultra-fast Pexels search...", sys.stderr)
+        executor.shutdown(wait=False, cancel_futures=True)
         
     return None
 
