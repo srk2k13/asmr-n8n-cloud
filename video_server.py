@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from gradio_client import Client
-PORT = int(os.environ.get('PORT', 10000))
+PORT = 5688
 class VideoServerHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         print(f"DEBUG Server: Received POST request for {self.path}", sys.stderr)
